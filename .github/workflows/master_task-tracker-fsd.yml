@@ -25,6 +25,18 @@ jobs:
         registry: https://index.docker.io/v1/
         username: ${{ secrets.AzureAppService_ContainerUsername_abf9b66ebd404651ac80a3097d3e2711 }}
         password: ${{ secrets.AzureAppService_ContainerPassword_dfff72a4b9384a559ee029f3f7b7964f }}
+      
+    - name: Create .env file for frontend
+      run: |
+          echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}" >> frontend/.env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}" >> frontend/.env
+          echo "VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}" >> frontend/.env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}" >> frontend/.env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}" >> frontend/.env
+          echo "VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}" >> frontend/.env
+          echo "VITE_BACKEND_HOST=${{ secrets.VITE_BACKEND_HOST }}" >> frontend/.env
+
+      
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
