@@ -1,0 +1,19 @@
+# .gitignore
+backend/auth/fsd-task-tracker-app-firebase-adminsdk-fbsvc-25b77c8307.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Firebase and secrets
+frontend/.env
+
+# Environment files
+.env
+
+venv/
+database_url.bat
+
