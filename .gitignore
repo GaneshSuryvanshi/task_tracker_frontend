@@ -9,10 +9,10 @@ __pycache__/
 node_modules/
 
 # Firebase and secrets
-frontend/.env
+#frontend/.env
 
 # Environment files
-.env
+#.env
 
 venv/
 database_url.bat
