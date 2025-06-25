@@ -8,6 +8,7 @@ COPY frontend/package*.json ./
 # Install dependencies
 RUN npm install
 
+COPY .env ./
 # Copy the rest of the frontend source code
 COPY frontend/ ./
 
