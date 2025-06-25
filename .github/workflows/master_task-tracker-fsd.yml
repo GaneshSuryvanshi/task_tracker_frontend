@@ -1,0 +1,51 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - task-tracker-fsd
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to registry
+      uses: docker/login-action@v2
+      with:
+        registry: https://index.docker.io/v1/
+        username: ${{ secrets.AzureAppService_ContainerUsername_abf9b66ebd404651ac80a3097d3e2711 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_dfff72a4b9384a559ee029f3f7b7964f }}
+
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_abf9b66ebd404651ac80a3097d3e2711 }}/fsd_task_tracker_frontend:${{ github.sha }}
+        file: ./Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'task-tracker-fsd'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_dbbd6d876e7f43919f4e7a4ccac7cec5 }}
+        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_abf9b66ebd404651ac80a3097d3e2711 }}/fsd_task_tracker_frontend:${{ github.sha }}'
