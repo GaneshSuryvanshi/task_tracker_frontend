@@ -8,9 +8,11 @@ COPY frontend/package*.json ./
 # Install dependencies
 RUN npm install
 
-COPY frontend/.env ./
+
 # Copy the rest of the frontend source code
 COPY frontend/ ./
+
+RUN ls -al && ls -al ./ && ls -al /app/frontend
 
 # Build the frontend
 RUN npm run build
