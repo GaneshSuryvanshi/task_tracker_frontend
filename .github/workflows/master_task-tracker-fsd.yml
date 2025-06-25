@@ -28,7 +28,7 @@ jobs:
       
     - name: Echo test secret
       run: echo "TEST_SECRET=${{ secrets.TEST_SECRET }}"
-      
+
     - name: Create .env file for frontend
       run: |
           echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}" >> frontend/.env
@@ -41,6 +41,12 @@ jobs:
 
     - name: Debug .env file
       run: cat frontend/.env
+
+    - name: List root directory
+      run: ls -al
+    
+    - name: List frontend directory
+      run: ls -al frontend
       
 
     - name: Build and push container image to registry
