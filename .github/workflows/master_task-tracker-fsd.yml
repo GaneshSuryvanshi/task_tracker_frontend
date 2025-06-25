@@ -26,6 +26,9 @@ jobs:
         username: ${{ secrets.AzureAppService_ContainerUsername_abf9b66ebd404651ac80a3097d3e2711 }}
         password: ${{ secrets.AzureAppService_ContainerPassword_dfff72a4b9384a559ee029f3f7b7964f }}
       
+    - name: Echo test secret
+      run: echo "TEST_SECRET=${{ secrets.TEST_SECRET }}"
+      
     - name: Create .env file for frontend
       run: |
           echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}" >> frontend/.env
@@ -35,7 +38,7 @@ jobs:
           echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}" >> frontend/.env
           echo "VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}" >> frontend/.env
           echo "VITE_BACKEND_HOST=${{ secrets.VITE_BACKEND_HOST }}" >> frontend/.env
-          
+
     - name: Debug .env file
       run: cat frontend/.env
       
