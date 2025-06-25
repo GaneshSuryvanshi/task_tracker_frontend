@@ -52,6 +52,7 @@ jobs:
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
+        context: .
         push: true
         tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_abf9b66ebd404651ac80a3097d3e2711 }}/fsd_task_tracker_frontend:${{ github.sha }}
         file: ./Dockerfile
