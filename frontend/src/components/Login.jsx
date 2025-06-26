@@ -5,7 +5,7 @@ import { auth } from "../firebase"; // <-- import your firebase config
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
-console.log("Backend host:", BACKEND_HOST);
+//console.log("Backend host:", BACKEND_HOST);
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -17,13 +17,13 @@ function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
     setError("");
-    console.log("Form submitted:", JSON.stringify(form));
-    const res = await fetch(`${BACKEND_HOST}/users/login/`, {
+    //console.log("Form submitted:", JSON.stringify(form));
+    const res = await fetch(`${BACKEND_HOST}/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    console.log("Login response:", res);
+    //console.log("Login response:", res);
     if (res.ok) {
       const user = await res.json();
       setUser(user);

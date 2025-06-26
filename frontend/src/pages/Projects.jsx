@@ -6,7 +6,7 @@ const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
 
 const Projects = ({ users, projects, setProjects }) => {
   const { user: loggedInUser } = useLoggedInUser();
-  console.log('Logged in user:', loggedInUser);
+  //console.log('Logged in user:', loggedInUser);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -43,7 +43,7 @@ const Projects = ({ users, projects, setProjects }) => {
     const payload = { ...formData, owner_id: formData.owner };
 
     if (editId !== null) {
-      fetch(`${BACKEND_HOST}/projects/${editId}/`, {
+      fetch(`${BACKEND_HOST}/projects/${editId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -54,7 +54,7 @@ const Projects = ({ users, projects, setProjects }) => {
           resetForm();
         });
     } else {
-      fetch(`${BACKEND_HOST}/projects/`, {
+      fetch(`${BACKEND_HOST}/projects`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -88,7 +88,7 @@ const Projects = ({ users, projects, setProjects }) => {
   const handleDelete = (id) => {
     if (!window.confirm( "All the tasks associated with this project will also be deleted. Are you sure you want to continue?")) return;
 
-    fetch(`${BACKEND_HOST}/projects/${id}/`, {
+    fetch(`${BACKEND_HOST}/projects/${id}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
     }).then(() => {

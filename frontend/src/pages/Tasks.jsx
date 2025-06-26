@@ -49,7 +49,7 @@ const initialProject = params.get("project") || "";
     const payload = { ...formData, owner_id: formData.owner };
 
     if (editId !== null) {
-      fetch(`${BACKEND_HOST}/tasks/${editId}/`, {
+      fetch(`${BACKEND_HOST}/tasks/${editId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -62,7 +62,7 @@ const initialProject = params.get("project") || "";
           resetForm();
         });
     } else {
-      fetch(`${BACKEND_HOST}/tasks/`, {
+      fetch(`${BACKEND_HOST}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -96,7 +96,7 @@ const initialProject = params.get("project") || "";
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
 
-    fetch(`${BACKEND_HOST}/tasks/${id}/`, {
+    fetch(`${BACKEND_HOST}/tasks/${id}`, {
       method: 'DELETE'
     })
       .then(() => {

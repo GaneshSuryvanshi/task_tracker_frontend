@@ -20,9 +20,9 @@ function AppRoutes() {
 
     useEffect(() => {
         Promise.all([
-            fetch(`${BACKEND_HOST}/users/`).then(res => res.json()),
-            fetch(`${BACKEND_HOST}/projects/`).then(res => res.json()),
-            fetch(`${BACKEND_HOST}/tasks/`).then(res => res.json())
+            fetch(`${BACKEND_HOST}/users`).then(res => res.json()),
+            fetch(`${BACKEND_HOST}/projects`).then(res => res.json()),
+            fetch(`${BACKEND_HOST}/tasks`).then(res => res.json())
         ])
             .then(([users, projects, tasks]) => {
                 setUsers(users);

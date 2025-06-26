@@ -15,10 +15,10 @@ const Users = ({ users, setUsers }) => {
   const [roleOptions, setRoleOptions] = useState({});
 
   const {user:Loggeduser} = useLoggedInUser();
-  console.log('Logged in user:', Loggeduser);
+  //console.log('Logged in user:', Loggeduser);
 
   useEffect(() => {
-    fetch(`${BACKEND_HOST}/roles/`)
+    fetch(`${BACKEND_HOST}/roles`)
       .then(response => response.json())
       .then(data => {
         const roleDict = {};
@@ -66,7 +66,7 @@ const Users = ({ users, setUsers }) => {
           resetForm();
         });
     } else {
-      fetch(`${BACKEND_HOST}/users/`, {
+      fetch(`${BACKEND_HOST}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -100,7 +100,7 @@ const Users = ({ users, setUsers }) => {
   const handleDelete = id => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
 
-    fetch(`${BACKEND_HOST}/users/${id}/`, {
+    fetch(`${BACKEND_HOST}/users/${id}`, {
       method: 'DELETE'
     }).then(() => {
       setUsers(users.filter(u => u.id !== id));
