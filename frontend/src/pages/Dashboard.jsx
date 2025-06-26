@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
 import { useLoggedInUser } from '../store/LoggedInUserContext';
+import { useSelector } from 'react-redux';
 
 // If you use Chart.js, install it: npm install chart.js react-chartjs-2
-import { Pie, Bar } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
-
-function Dashboard({ projects = [], users = [], tasks = [] }) {
-  const {user:loggedInUser} = useLoggedInUser();
-
+function Dashboard() {
+  const { user: loggedInUser } = useLoggedInUser();
+  const users = useSelector((state) => state.users);
+  const projects = useSelector((state) => state.projects);
+  const tasks = useSelector((state) => state.tasks);
 
   // Calculate stats
   const totalProjects = projects.length;

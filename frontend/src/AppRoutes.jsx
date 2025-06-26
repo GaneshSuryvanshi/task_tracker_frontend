@@ -38,33 +38,33 @@ function AppRoutes() {
     }, [dispatch]);
 
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route
-                    path="/*"
-                    element={
-                        <RequireAuth>
-                            <Navbar />
-                            <div className="flex">
-                                <Sidebar />
-                                <div className="ml-64 w-full p-6">
-                                    <Routes>
-                                        <Route path="/" element={<Dashboard users={users} tasks={tasks} projects={projects} />} />
-                                        <Route path="/projects" element={<Projects users={users} projects={projects} />} />
-                                        <Route path="/tasks" element={<Tasks users={users} tasks={tasks} projects={projects} />} />
-                                        {loggedInUser?.role === "admin" && (
-                                            <Route path="/users" element={<Users users={users} />} />
-                                        )}
-                                    </Routes>
-                                </div>
-                            </div>
-                        </RequireAuth>
-                    }
-                />
-            </Routes>
-        </BrowserRouter>
-    );
+ <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/*"
+          element={
+            <RequireAuth>
+              <Navbar />
+              <div className="flex">
+                <Sidebar />
+                <div className="ml-64 w-full p-6">
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/projects" element={<Projects />} />
+                    <Route path="/tasks" element={<Tasks />} />
+                    {loggedInUser?.role === "admin" && (
+                      <Route path="/users" element={<Users />} />
+                    )}
+                  </Routes>
+                </div>
+              </div>
+            </RequireAuth>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default AppRoutes;
