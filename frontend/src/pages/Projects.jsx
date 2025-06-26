@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useLoggedInUser } from '../store/LoggedInUserContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { setProjects } from '../store/projectsSlice';
 import { Link } from 'react-router-dom';
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
 
 
-const Projects = ({ users, projects, setProjects }) => {
+const Projects = () => {
+  const dispatch = useDispatch();
+  const projects = useSelector((state) => state.projects);
+  const users = useSelector((state) => state.users);
   const { user: loggedInUser } = useLoggedInUser();
-  //console.log('Logged in user:', loggedInUser);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -50,7 +54,8 @@ const Projects = ({ users, projects, setProjects }) => {
       })
         .then(response => response.json())
         .then(updated => {
-          setProjects(projects.map(p => (p.id === updated.id ? updated : p)));
+          const updatedProjects = projects.map(p => (p.id === updated.id ? updated : p));
+          dispatch(setProjects(updatedProjects));
           resetForm();
         });
     } else {
@@ -61,7 +66,7 @@ const Projects = ({ users, projects, setProjects }) => {
       })
         .then(response => response.json())
         .then(newProject => {
-          setProjects([...projects, newProject]);
+          dispatch(setProjects([...projects, newProject]));
           resetForm();
         });
     }
@@ -92,7 +97,7 @@ const Projects = ({ users, projects, setProjects }) => {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
     }).then(() => {
-      setProjects(projects.filter(p => p.id !== id));
+      dispatch(setProjects(projects.filter(p => p.id !== id)));
     });
   };
 

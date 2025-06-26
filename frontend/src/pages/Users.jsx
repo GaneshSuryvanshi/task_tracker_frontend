@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
-
 import { useLoggedInUser } from '../store/LoggedInUserContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUsers } from '../store/usersSlice';
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
-const Users = ({ users, setUsers }) => {
+
+const Users = () => {
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.users);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     role_id: '2'
   });
-
   const [editId, setEditId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [roleOptions, setRoleOptions] = useState({});
-
-  const {user:Loggeduser} = useLoggedInUser();
-  //console.log('Logged in user:', Loggeduser);
+  const { user: Loggeduser } = useLoggedInUser();
 
   useEffect(() => {
     fetch(`${BACKEND_HOST}/roles`)
@@ -50,11 +51,10 @@ const Users = ({ users, setUsers }) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-
     if (editId !== null) {
-       if (!formData.password) {
-      delete formData.password;
-    }
+      if (!formData.password) {
+        delete formData.password;
+      }
       fetch(`${BACKEND_HOST}/users/${editId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -62,7 +62,8 @@ const Users = ({ users, setUsers }) => {
       })
         .then(response => response.json())
         .then(updatedUser => {
-          setUsers(users.map(u => (u.id === updatedUser.id ? updatedUser : u)));
+          const updatedUsers = users.map(u => (u.id === updatedUser.id ? updatedUser : u));
+          dispatch(setUsers(updatedUsers));
           resetForm();
         });
     } else {
@@ -73,7 +74,7 @@ const Users = ({ users, setUsers }) => {
       })
         .then(response => response.json())
         .then(newUser => {
-          setUsers([...users, newUser]);
+          dispatch(setUsers([...users, newUser]));
           resetForm();
         })
         .catch(err => console.error('Create user error:', err));
@@ -99,11 +100,10 @@ const Users = ({ users, setUsers }) => {
 
   const handleDelete = id => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
-
     fetch(`${BACKEND_HOST}/users/${id}`, {
       method: 'DELETE'
     }).then(() => {
-      setUsers(users.filter(u => u.id !== id));
+      dispatch(setUsers(users.filter(u => u.id !== id)));
     });
   };
 
@@ -115,8 +115,6 @@ const Users = ({ users, setUsers }) => {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">Users & Roles</h2>
-
-      {/* Only admin can create users */}
       {Loggeduser.role === 'admin' && (
         <button
           onClick={toggleForm}
@@ -125,8 +123,6 @@ const Users = ({ users, setUsers }) => {
           New User
         </button>
       )}
-
-      {/* Modal: Only admin can add/edit users */}
       {showForm && Loggeduser.role === 'admin' && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded shadow-lg p-6 w-full max-w-xl relative">
@@ -170,7 +166,7 @@ const Users = ({ users, setUsers }) => {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
-                  required={!editId} // Only required when creating
+                  required={!editId}
                 />
               </div>
               <div>
@@ -207,8 +203,6 @@ const Users = ({ users, setUsers }) => {
           </div>
         </div>
       )}
-
-      {/* User List */}
       <div className="mt-6">
         <h3 className="text-xl mb-2">User List</h3>
         {users.length === 0 ? (
@@ -222,7 +216,6 @@ const Users = ({ users, setUsers }) => {
                   <p><strong>Email:</strong> {user.email}</p>
                   <p><strong>Role:</strong> {roleOptions[user.role_id] || 'N/A'}</p>
                 </div>
-                {/* Only admin can edit/delete users */}
                 {Loggeduser.role === 'admin' && (
                   <div className="space-x-2">
                     <button

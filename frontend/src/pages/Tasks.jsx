@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useLoggedInUser } from '../store/LoggedInUserContext';
 import { useLocation } from 'react-router-dom';
+import { useLoggedInUser } from '../store/LoggedInUserContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTasks } from '../store/tasksSlice';
 
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
 const statusOptions = ['new', 'in-progress', 'blocked', 'completed', 'not started'];
 
-const Tasks = ({ projects, users, tasks, setTasks }) => {
-const location = useLocation();
-const params = new URLSearchParams(location.search);
-const initialProject = params.get("project") || "";
+const Tasks = () => {
+  const dispatch = useDispatch();
+  const projects = useSelector((state) => state.projects);
+  const users = useSelector((state) => state.users);
+  const tasks = useSelector((state) => state.tasks);
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const initialProject = params.get("project") || "";
   const [selectedProject, setSelectedProject] = useState(initialProject);
   const [selectedOwner, setSelectedOwner] = useState("");
-  const {user:loggedInUser} = useLoggedInUser();
+  const { user: loggedInUser } = useLoggedInUser();
   const [formData, setFormData] = useState({
     description: '',
     due_date: '',
@@ -19,9 +25,6 @@ const initialProject = params.get("project") || "";
     owner: '',
     project_id: ''
   });
-
-
-
   const [editId, setEditId] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -45,9 +48,7 @@ const initialProject = params.get("project") || "";
 
   const handleSubmit = e => {
     e.preventDefault();
-
     const payload = { ...formData, owner_id: formData.owner };
-
     if (editId !== null) {
       fetch(`${BACKEND_HOST}/tasks/${editId}`, {
         method: 'PUT',
@@ -56,9 +57,8 @@ const initialProject = params.get("project") || "";
       })
         .then(response => response.json())
         .then(updatedTask => {
-          setTasks(tasks.map(task =>
-            task.id === updatedTask.id ? updatedTask : task
-          ));
+          const updatedTasks = tasks.map(t => (t.id === updatedTask.id ? updatedTask : t));
+          dispatch(setTasks(updatedTasks));
           resetForm();
         });
     } else {
@@ -69,7 +69,7 @@ const initialProject = params.get("project") || "";
       })
         .then(response => response.json())
         .then(newTask => {
-          setTasks([...tasks, newTask]);
+          dispatch(setTasks([...tasks, newTask]));
           resetForm();
         });
     }
@@ -95,12 +95,11 @@ const initialProject = params.get("project") || "";
 
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
-
     fetch(`${BACKEND_HOST}/tasks/${id}`, {
       method: 'DELETE'
     })
       .then(() => {
-        setTasks(tasks.filter(task => task.id !== id));
+        dispatch(setTasks(tasks.filter(t => t.id !== id)));
       });
   };
 
@@ -115,7 +114,7 @@ const initialProject = params.get("project") || "";
   };
 
   const toggleForm = () => {
-    resetForm(); // This also sets showForm to false
+    resetForm();
     setShowForm(!showForm);
   };
 
@@ -125,20 +124,19 @@ const initialProject = params.get("project") || "";
   const isNormalUser = loggedInUser.role === 'user';
 
   // Show all tasks for admin and task_creator, otherwise only assigned tasks
-const visibleTasks = (isAdmin || isTaskCreator)
-  ? tasks
-  : tasks.filter(task => String(task.owner_id) === String(loggedInUser.id));
+  const visibleTasks = (isAdmin || isTaskCreator)
+    ? tasks
+    : tasks.filter(task => String(task.owner_id) === String(loggedInUser.id));
 
-// Filter tasks based on selected project and owner
-const filteredTasks = visibleTasks.filter(task =>
-  (selectedProject ? String(task.project_id) === String(selectedProject) : true) &&
-  (selectedOwner ? String(task.owner_id) === String(selectedOwner) : true)
-);
+  // Filter tasks based on selected project and owner
+  const filteredTasks = visibleTasks.filter(task =>
+    (selectedProject ? String(task.project_id) === String(selectedProject) : true) &&
+    (selectedOwner ? String(task.owner_id) === String(selectedOwner) : true)
+  );
 
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">Tasks</h2>
-      {/* Only admin and task_creator can create tasks */}
       {(isAdmin || isTaskCreator) && (
         <button
           onClick={toggleForm}
@@ -147,8 +145,6 @@ const filteredTasks = visibleTasks.filter(task =>
           {showForm ? 'Cancel' : 'New Task'}
         </button>
       )}
-
-      {/* Modal for Create/Edit Task */}
       {showForm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded shadow-lg p-6 w-full max-w-xl relative">
@@ -160,7 +156,6 @@ const filteredTasks = visibleTasks.filter(task =>
             </button>
             <h3 className="text-xl font-bold mb-4">{editId ? 'Edit Task' : 'Create Task'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Only admin and task_creator can edit all fields, normal user can only update status if assigned */}
               {(isAdmin || isTaskCreator || (isNormalUser && formData.owner == loggedInUser.id)) ? (
                 <>
                   <div>
@@ -256,8 +251,6 @@ const filteredTasks = visibleTasks.filter(task =>
           </div>
         </div>
       )}
-
-      {/* Filters: Project and Owner, right-aligned in a single line */}
       <div className="flex justify-end mb-4 gap-4">
         <div className="flex items-center gap-2">
           <label className="font-semibold">Project:</label>
@@ -286,8 +279,6 @@ const filteredTasks = visibleTasks.filter(task =>
           </select>
         </div>
       </div>
-
-      {/* Task list */}
       {filteredTasks.length === 0 ? (
         <p className="mt-4 text-gray-500">No tasks available.</p>
       ) : (
@@ -313,21 +304,15 @@ const filteredTasks = visibleTasks.filter(task =>
                 const canEdit = canEditAll || canEditStatus;
                 const canDelete = isAdmin;
                 return (
-                  <tr key={task.id} className="hover:bg-stone-100">
-                    <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
-                    {/* Description */}
-                    <td className="px-4 py-2 border-b text-center">{task.description}</td>
-                    {/* Project */}
-                    <td className="px-4 py-2 border-b text-center">{getProjectName(task.project_id)}</td>
-                    {/* Due Date */}
-                    <td className="px-4 py-2 border-b text-center">{task.due_date}</td>
-                    {/* Owner */}
-                    <td className="px-4 py-2 border-b text-center">{getUserName(task.owner_id)}</td>
-                    {/* Status */}
-                    <td className="px-4 py-2 border-b text-center">{task.status}</td>
-                    {/* Actions */}
-                    <td className="px-4 py-2 border-b text-center">
-                      {(canEditAll || canEditStatus) && (
+                  <tr key={task.id}>
+                    <td className="px-4 py-2 border-b">{idx + 1}</td>
+                    <td className="px-4 py-2 border-b">{task.description}</td>
+                    <td className="px-4 py-2 border-b">{getProjectName(task.project_id)}</td>
+                    <td className="px-4 py-2 border-b">{task.due_date}</td>
+                    <td className="px-4 py-2 border-b">{getUserName(task.owner_id)}</td>
+                    <td className="px-4 py-2 border-b">{task.status}</td>
+                    <td className="px-4 py-2 border-b">
+                      {canEdit && (
                         <button
                           onClick={() => handleEdit(task)}
                           className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
