@@ -10,7 +10,7 @@ import Users from "./pages/Users";
 import Login from "./components/Login";
 import RequireAuth from "./components/RequireAuth";
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
-console.log("Backend host:", BACKEND_HOST);
+
 
 function AppRoutes() {
     const { user: loggedInUser } = useLoggedInUser();
