@@ -8,6 +8,7 @@ const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
 const statusOptions = ['new', 'in-progress', 'blocked', 'completed', 'not started'];
 
 const Tasks = () => {
+  const today = new Date().toISOString().split('T')[0];
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects);
   const users = useSelector((state) => state.users);
@@ -204,6 +205,7 @@ const handleDelete = (id) => {
                     <input
                       name="due_date"
                       type="date"
+                      min={today}
                       value={formData.due_date}
                       onChange={handleChange}
                       className="w-full border p-2 rounded"

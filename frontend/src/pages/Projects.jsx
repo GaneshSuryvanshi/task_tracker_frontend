@@ -7,6 +7,7 @@ const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
 
 
 const Projects = () => {
+  const today = new Date().toISOString().split('T')[0];
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects);
   const users = useSelector((state) => state.users);
@@ -186,6 +187,7 @@ const Projects = () => {
                 <input
                   name="start_date"
                   type="date"
+                  min={today}
                   value={formData.start_date}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
@@ -196,6 +198,7 @@ const Projects = () => {
                 <input
                   name="end_date"
                   type="date"
+                  min={today}
                   value={formData.end_date}
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
