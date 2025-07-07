@@ -98,7 +98,7 @@ const Projects = () => {
   };
 
   const handleDelete = (id) => {
-    if (!window.confirm( "All the tasks associated with this project will also be deleted. Are you sure you want to continue?")) return;
+    if (!window.confirm("Are you sure you want to continue?")) return;
 
     const token = localStorage.getItem('token') || '';
     fetch(`${BACKEND_HOST}/projects/${id}`, {
@@ -107,9 +107,27 @@ const Projects = () => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
-    }).then(() => {
-      dispatch(setProjects(projects.filter(p => p.id !== id)));
-    });
+    })
+      .then(async (response) => {
+        if (response.status === 204) {
+          alert("Project deleted successfully");
+          dispatch(setProjects(projects.filter(p => p.id !== id)));
+        } else {
+          let errorMsg = "Something went wrong";
+          try {
+            const data = await response.json();
+            if (data && data.detail) {
+              errorMsg = data.detail;
+            }
+          } catch (e) {
+            // ignore JSON parse error
+          }
+          alert(errorMsg);
+        }
+      })
+      .catch(() => {
+        alert("Something went wrong");
+      });
   };
 
   const toggleForm = () => {

@@ -106,18 +106,36 @@ const Users = () => {
     setShowForm(true);
   };
 
-  const handleDelete = id => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
-    const token = localStorage.getItem('token') || '';
-    fetch(`${BACKEND_HOST}/users/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
+const handleDelete = id => {
+  if (!window.confirm('Are you sure you want to delete this user?')) return;
+  const token = localStorage.getItem('token') || '';
+  fetch(`${BACKEND_HOST}/users/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then(async (response) => {
+      if (response.status === 204) {
+        alert("User deleted successfully");
+        dispatch(setUsers(users.filter(u => u.id !== id)));
+      } else {
+        let errorMsg = "Something went wrong";
+        try {
+          const data = await response.json();
+          if (data && data.detail) {
+            errorMsg = data.detail;
+          }
+        } catch (e) {
+          // ignore JSON parse error
+        }
+        alert(errorMsg);
       }
-    }).then(() => {
-      dispatch(setUsers(users.filter(u => u.id !== id)));
+    })
+    .catch(() => {
+      alert("Something went wrong");
     });
-  };
+};
 
   const toggleForm = () => {
     resetForm();

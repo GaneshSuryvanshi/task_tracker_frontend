@@ -100,19 +100,36 @@ const Tasks = () => {
     setShowForm(true);
   };
 
-  const handleDelete = (id) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
-    const token = localStorage.getItem('token') || '';
-    fetch(`${BACKEND_HOST}/tasks/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+const handleDelete = (id) => {
+  if (!window.confirm("Are you sure you want to delete this task?")) return;
+  const token = localStorage.getItem('token') || '';
+  fetch(`${BACKEND_HOST}/tasks/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then(async (response) => {
+      if (response.status === 204) {
+        alert("Task deleted successfully");
+        dispatch(setTasks(tasks.filter(t => t.id !== id)));
+      } else {
+        let errorMsg = "Something went wrong";
+        try {
+          const data = await response.json();
+          if (data && data.detail) {
+            errorMsg = data.detail;
+          }
+        } catch (e) {
+          // ignore JSON parse error
+        }
+        alert(errorMsg);
       }
     })
-      .then(() => {
-        dispatch(setTasks(tasks.filter(t => t.id !== id)));
-      });
+    .catch(() => {
+      alert("Something went wrong");
+    });
   };
 
   const getProjectName = (id) => {
