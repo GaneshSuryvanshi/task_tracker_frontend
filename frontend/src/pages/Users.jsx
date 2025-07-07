@@ -10,7 +10,6 @@ const Users = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
     role_id: '2'
   });
   const [editId, setEditId] = useState(null);
@@ -19,7 +18,13 @@ const Users = () => {
   const { user: Loggeduser } = useLoggedInUser();
 
   useEffect(() => {
-    fetch(`${BACKEND_HOST}/roles`)
+    const token = localStorage.getItem('token') || '';
+    fetch(`${BACKEND_HOST}/roles`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then(response => response.json())
       .then(data => {
         const roleDict = {};
@@ -51,13 +56,14 @@ const Users = () => {
 
   const handleSubmit = e => {
     e.preventDefault();
+    const token = localStorage.getItem('token') || '';
     if (editId !== null) {
-      if (!formData.password) {
-        delete formData.password;
-      }
       fetch(`${BACKEND_HOST}/users/${editId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(formData)
       })
         .then(response => response.json())
@@ -69,7 +75,10 @@ const Users = () => {
     } else {
       fetch(`${BACKEND_HOST}/users`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(formData)
       })
         .then(response => response.json())
@@ -82,7 +91,7 @@ const Users = () => {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', email: '', password: '', role_id: '2' });
+    setFormData({ name: '', email: '', role_id: '2' });
     setEditId(null);
     setShowForm(false);
   };
@@ -91,7 +100,6 @@ const Users = () => {
     setFormData({
       name: user.name,
       email: user.email,
-      password: '',
       role_id: user.role_id
     });
     setEditId(user.id);
@@ -100,8 +108,12 @@ const Users = () => {
 
   const handleDelete = id => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
+    const token = localStorage.getItem('token') || '';
     fetch(`${BACKEND_HOST}/users/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     }).then(() => {
       dispatch(setUsers(users.filter(u => u.id !== id)));
     });
@@ -155,18 +167,6 @@ const Users = () => {
                   onChange={handleChange}
                   className="w-full border p-2 rounded"
                   required
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">Password</label>
-                <input
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full border p-2 rounded"
-                  required={!editId}
                 />
               </div>
               <div>

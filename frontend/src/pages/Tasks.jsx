@@ -49,10 +49,14 @@ const Tasks = () => {
   const handleSubmit = e => {
     e.preventDefault();
     const payload = { ...formData, owner_id: formData.owner };
+    const token = localStorage.getItem('token') || '';
     if (editId !== null) {
       fetch(`${BACKEND_HOST}/tasks/${editId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       })
         .then(response => response.json())
@@ -64,7 +68,10 @@ const Tasks = () => {
     } else {
       fetch(`${BACKEND_HOST}/tasks`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       })
         .then(response => response.json())
@@ -95,8 +102,13 @@ const Tasks = () => {
 
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
+    const token = localStorage.getItem('token') || '';
     fetch(`${BACKEND_HOST}/tasks/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
     })
       .then(() => {
         dispatch(setTasks(tasks.filter(t => t.id !== id)));

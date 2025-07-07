@@ -45,11 +45,15 @@ const Projects = () => {
     e.preventDefault();
 
     const payload = { ...formData, owner_id: formData.owner };
+    const token = localStorage.getItem('token') || '';
 
     if (editId !== null) {
       fetch(`${BACKEND_HOST}/projects/${editId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       })
         .then(response => response.json())
@@ -61,7 +65,10 @@ const Projects = () => {
     } else {
       fetch(`${BACKEND_HOST}/projects`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       })
         .then(response => response.json())
@@ -93,9 +100,13 @@ const Projects = () => {
   const handleDelete = (id) => {
     if (!window.confirm( "All the tasks associated with this project will also be deleted. Are you sure you want to continue?")) return;
 
+    const token = localStorage.getItem('token') || '';
     fetch(`${BACKEND_HOST}/projects/${id}`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
     }).then(() => {
       dispatch(setProjects(projects.filter(p => p.id !== id)));
     });

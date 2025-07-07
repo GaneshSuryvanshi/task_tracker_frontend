@@ -19,23 +19,31 @@ const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
 function AppRoutes() {
     const { user: loggedInUser } = useLoggedInUser();
     const dispatch = useDispatch();
-    const users = useSelector((state) => state.users);
-    const projects = useSelector((state) => state.projects);
-    const tasks = useSelector((state) => state.tasks);
+
 
     useEffect(() => {
-        Promise.all([
-            fetch(`${BACKEND_HOST}/users`).then(res => res.json()),
-            fetch(`${BACKEND_HOST}/projects`).then(res => res.json()),
-            fetch(`${BACKEND_HOST}/tasks`).then(res => res.json())
-        ])
-            .then(([users, projects, tasks]) => {
-                dispatch(setUsers(users));
-                dispatch(setProjects(projects));
-                dispatch(setTasks(tasks));
-            })
-            .catch(err => console.error('Error fetching data:', err));
-    }, [dispatch]);
+        // Only fetch if user is logged in and token is available
+        if (loggedInUser && localStorage.getItem("token")) {
+            const token = localStorage.getItem("token");
+            Promise.all([
+                fetch(`${BACKEND_HOST}/users`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => res.json()),
+                fetch(`${BACKEND_HOST}/projects`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => res.json()),
+                fetch(`${BACKEND_HOST}/tasks`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }).then(res => res.json())
+            ])
+                .then(([users, projects, tasks]) => {
+                    dispatch(setUsers(users));
+                    dispatch(setProjects(projects));
+                    dispatch(setTasks(tasks));
+                })
+                .catch(err => console.error('Error fetching data:', err));
+        }
+    }, [loggedInUser, dispatch]);
 
     return (
  <BrowserRouter>

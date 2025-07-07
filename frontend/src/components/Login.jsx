@@ -26,8 +26,10 @@ function Login() {
     //console.log("Login response:", res);
     if (res.ok) {
       const user = await res.json();
+      localStorage.setItem("token", user.token); 
       setUser(user);
-      localStorage.setItem("user", JSON.stringify(user));
+      //localStorage.setItem("user", JSON.stringify(user));
+      // Store token in localStorage
       navigate("/");
     } else {
       setError("Invalid credentials");
@@ -63,8 +65,11 @@ function Login() {
           email,
           role
         };
+        localStorage.setItem("token", idToken);
         setUser(user);
-        localStorage.setItem("user", JSON.stringify(user));
+ // Store token in localStorage
+
+        //localStorage.setItem("user", JSON.stringify(user));
         navigate("/");
       } else {
         setError("User not found in system. Please contact admin.");
